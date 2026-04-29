@@ -62,8 +62,8 @@ public class Reader {
         // Now check whether this word is known. If so, create a command
         // with it. If not, create a "null" command (for unknown command).
         Command result = null;
-        if (CommandWords.isCommand(word1)) {
-            result = new Command(word1, restOfLine);
+        if (CommandWords.isCommand(CommandWords.getCommand(word1))) {
+            result = new Command(CommandWords.getCommand(word1), restOfLine);
         }
         else {
             result = new Command(null, restOfLine);
@@ -76,18 +76,35 @@ public class Reader {
      *
      * @return The response typed in by the user.
      */
-    public static String getResponse() {
-    	return getResponseKeepCase().toLowerCase();
-    }
+    public static CommandEnum getCommand(String theString) {
+		CommandEnum retval = null;
+		switch(theString) {
+		case "go":
+			retval = CommandEnum.go;
+			break;
+		case "help":
+			retval = CommandEnum.help;
+			break;
+		case "look":
+			retval = CommandEnum.look;
+			break;
+		case "quit":
+			retval = CommandEnum.quit;
+			break;
+		case "status":
+			retval = CommandEnum.status;
+			break;
+		case "back":
+			retval = CommandEnum.back;
+			break;
+			default:
+		}
+		return retval;
+	}
 
     /**
      * Return the response to a question in the case used by the player.
      *
      * @return The response typed in by the user.
      */
-    public static String getResponseKeepCase() {
-        String response = reader.nextLine().trim();
-        Writer.printInput(response);
-        return response;
-    }
 }

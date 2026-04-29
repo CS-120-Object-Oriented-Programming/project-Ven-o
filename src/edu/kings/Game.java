@@ -16,10 +16,13 @@ package edu.kings;
  */
 
 public class Game {
+	Player Kirby;
 	/** The world where the game takes place. */
 	private World world;
 	/** The room the player character is currently in. */
-	private Room currentRoom;
+	private int score;
+	
+	private int moves;
 
 	/**
 	 * Create the game and initialize its internal map.
@@ -27,7 +30,8 @@ public class Game {
 	public Game() {
 		world = new World();
 		// set the starting room
-		currentRoom = world.getRoom("outside");
+		Kirby= new Player(world.getRoom("outside"));
+		Kirby.getcurrentRoom();
 	}
 
 	/**
@@ -64,14 +68,28 @@ public class Game {
 			Writer.println("I don't know what you mean...");
 		} else {
 
-			String commandWord = command.getCommandWord();
-			if (commandWord.equals("help")) {
-				printHelp();
-			} else if (commandWord.equals("go")) {
+			CommandEnum commandWord = command.getCommandWord();
+			switch(commandWord) {
+			case CommandEnum.go:
 				goRoom(command);
-			} else if (commandWord.equals("quit")) {
+				break;
+			case CommandEnum.help:
+				printHelp();
+				break;
+			case CommandEnum.quit:
 				wantToQuit = quit(command);
-			} else {
+				break;
+			case CommandEnum.look:
+				look();
+				break;
+			case CommandEnum.status:
+				status();
+				break;
+			case CommandEnum.back:
+				back();
+				break;
+			default:
+				
 				Writer.println(commandWord + " is not implemented yet!");
 			}
 		}
@@ -99,23 +117,23 @@ public class Game {
 			// Try to leave current.
 			Door doorway = null;
 			if (direction.equals("north")) {
-				doorway = currentRoom.northExit;
+				doorway = Kirby.getcurrentRoom().northExit;
 			}
 			if (direction.equals("east")) {
-				doorway = currentRoom.eastExit;
+				doorway = Kirby.getcurrentRoom().eastExit;
 			}
 			if (direction.equals("south")) {
-				doorway = currentRoom.southExit;
+				doorway = Kirby.getcurrentRoom().southExit;
 			}
 			if (direction.equals("west")) {
-				doorway = currentRoom.westExit;
+				doorway = Kirby.getcurrentRoom().westExit;
 			}
 
 			if (doorway == null) {
 				Writer.println("There is no door!");
 			} else {
 				Room newRoom = doorway.getDestination();
-				currentRoom = newRoom;
+				Kirby.setcurrentRoom(newRoom);
 				Writer.println(newRoom.getName() + ":");
 				Writer.println("You are " + newRoom.getDescription());
 				Writer.print("Exits: ");
@@ -153,7 +171,7 @@ public class Game {
 		Writer.println("around at the university.");
 		Writer.println();
 		Writer.println("Your command words are:");
-		Writer.println("   go quit help");
+		Writer.println("   go quit help look status back");
 	}
 
 	/**
@@ -165,22 +183,64 @@ public class Game {
 		Writer.println("Campus of Kings is a new, incredibly boring adventure game.");
 		Writer.println("Type 'help' if you need help.");
 		Writer.println();
-		Writer.println(currentRoom.getName() + ":");
-		Writer.println("You are " + currentRoom.getDescription());
+		Writer.println(Kirby.getcurrentRoom().getName() + ":");
+		Writer.println("You are " + Kirby.getcurrentRoom().getDescription());
 		Writer.print("Exits: ");
-		if (currentRoom.northExit != null) {
+		if (Kirby.getcurrentRoom().northExit != null) {
 			Writer.print("north ");
 		}
-		if (currentRoom.eastExit != null) {
+		if (Kirby.getcurrentRoom().eastExit != null) {
 			Writer.print("east ");
 		}
-		if (currentRoom.southExit != null) {
+		if (Kirby.getcurrentRoom().southExit != null) {
 			Writer.print("south ");
 		}
-		if (currentRoom.westExit != null) {
+		if (Kirby.getcurrentRoom().westExit != null) {
 			Writer.print("west ");
 		}
 		Writer.println("");
+	}
+	private void printLocationInformation(){
+
+		Writer.println(Kirby.getcurrentRoom().getName() + ":");
+		Writer.println("You are " + Kirby.getcurrentRoom().getDescription());
+		Writer.print("Exits: ");
+		if (Kirby.getcurrentRoom().northExit != null) {
+			Writer.print("north ");
+		}
+		if (Kirby.getcurrentRoom().eastExit != null) {
+			Writer.print("east ");
+		}
+		if (Kirby.getcurrentRoom().southExit != null) {
+			Writer.print("south ");
+		}
+		if (Kirby.getcurrentRoom().westExit != null) {
+			Writer.print("west ");
+		}
+		Writer.println("");
+	}
+	
+	/**
+	 * Prints out the location information.
+	 */
+	private void look() {
+		printLocationInformation();
+	}
+	
+	
+	
+	/**
+	 * Prints out player score, number of turns, room description
+	 */
+	private void status() {
+		Writer.println("Your score is: " + score + " you have also made " + moves + " moves");
+		printLocationInformation();
+	}
+	
+	private void back() {
+		moves++;
+		Kirby.setcurrentRoom(Kirby.getPastRoom());
+		printLocationInformation();
 	}
 
 	/**
